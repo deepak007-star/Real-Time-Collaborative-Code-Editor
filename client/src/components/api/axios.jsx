@@ -1,7 +1,8 @@
 import axios from 'axios'
 
+const URL = 'http://localhost:3000/api';
 const api = axios.create({
-    baseURL:'http://localhost:3000/',
+    baseURL:URL,
 })
 
 api.interceptors.request.use((config)=>{
@@ -10,8 +11,28 @@ api.interceptors.request.use((config)=>{
         config.headers.Authorization = `Bearer ${token}`
     }
     return config;
-})
 
+})
+export const register = async(email, name, password)=>{
+    try {
+        const response = await api.post(`/auth/register`, {email, name, password});
+        return response.data
+    } catch (error) {
+        const errorMessage =
+      error.response?.data?.message || error.response?.data || "Registration failed";
+    throw new Error(errorMessage);
+    }
+}   
+export const login = async(email, password)=>{
+    try {
+        const response =await axios.post(`${URL}/auth/login`, {email, password});
+        return response.data;
+    } catch (error) {
+        const errorMessage =
+      error.response?.data?.message || error.response?.data || "Login failed";
+    throw new Error(errorMessage);
+    }
+}
 export const createRoom = async(code)=>{
     try {
         const response = await api.post('create-room', {code})
