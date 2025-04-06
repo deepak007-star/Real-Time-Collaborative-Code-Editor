@@ -15,6 +15,21 @@ const versionSchema = mongoose.Schema({
         default:Date.now()
     }
 })
+
+const statusSchema = mongoose.Schema({
+    users:{
+        type:mongoose.SchemaTypes.ObjectId,
+        ref:'User', 
+    },
+    isActive:{
+        type:Boolean, 
+        default:true,
+    },
+    joinedAt:{
+        type:Date,
+        default:Date.now
+    }
+})
 const roomSchema =mongoose.Schema({
     roomId:{
         type:String, 
@@ -28,10 +43,7 @@ const roomSchema =mongoose.Schema({
         type:String, 
         default:'C++'
     },
-    users:[{
-        type:mongoose.SchemaTypes.ObjectId,
-        ref:'User',
-    }],
+    users:[statusSchema],
     createdBy:{
         type:mongoose.SchemaTypes.ObjectId,
         ref:'User',

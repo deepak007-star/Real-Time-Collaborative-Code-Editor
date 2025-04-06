@@ -2,7 +2,7 @@ const { StatusCodes } = require('http-status-codes')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
-const authentication = (req, res, next)=>{
+const authentication = (req, res, next)=>{    
     const authHeader = req.headers.authorization
     if(!authHeader || !authHeader.startsWith('Bearer')){
         return res.status(StatusCodes.UNAUTHORIZED).json({message:"authentication invalid"})
@@ -15,5 +15,6 @@ const authentication = (req, res, next)=>{
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("authentication failed")
     }
+    
 }
 module.exports = authentication;

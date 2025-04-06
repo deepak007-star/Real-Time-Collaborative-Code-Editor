@@ -11,9 +11,6 @@ const register = async (req, res) => {
     if (existing) {
       return res.status(StatusCodes.BAD_REQUEST).send("user already exists");
     }
-    // if(!name || !email ||!password){
-    //     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("fill all details")
-    // }
     const user = await User.create({ name, email, password });
     if (!user) {
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("failed!");
@@ -28,17 +25,26 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
   if (email && password) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ success: false, msg: "fill all details" });
+  }
+  try {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).send("user not found");
     }
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await User.comparePass(password);
     if (!isMatch) {
       return res.status(StatusCodes.BAD_REQUEST).send("wrong password");
     }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { userId: user._id, name: user.name },
+      process.env.JWT,
+      {
+        expiresIn: "1h",
+      }
+    );
     res.status(StatusCodes.OK).json({
       message: "login successfull",
       user: {
@@ -47,10 +53,10 @@ const login = async (req, res) => {
       },
       token,
     });
-  } else {
-    return res
+  } catch (error) {
+    res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ message: "failed to login" });
+      .json({ message: error.message });
   }
 };
 module.exports = { register, login };
